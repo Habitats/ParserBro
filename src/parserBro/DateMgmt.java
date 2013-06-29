@@ -4,12 +4,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 public class DateMgmt {
-
-	public static final TimeZone TIME_ZONE = TimeZone.getTimeZone("UTC");
 
 	public static void main(String[] args) {
 		getCurrentYear();
@@ -126,5 +125,17 @@ public class DateMgmt {
 	public static String getFormattedSinceDate(Date sinceDate) {
 		long msSinceLast = new Date().getTime() - sinceDate.getTime();
 		return formatMs(msSinceLast);
+	}
+
+	public static String getFormattedDate(Date date) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.UK);
+		sdf.setTimeZone(Config.TIME_ZONE);
+		return date != null ? sdf.format(date) : null;
+	}
+
+	public static String getFormattedAirTime(Date date) {
+		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm z", Locale.UK);
+		sdf.setTimeZone(Config.TIME_ZONE);
+		return date != null ? sdf.format(date) : null;
 	}
 }

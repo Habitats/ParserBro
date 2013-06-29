@@ -1,10 +1,15 @@
 package parserBro.parsers.tvParser;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import lombok.Data;
+
+import parserBro.Config;
 import parserBro.DateMgmt;
 
 public class TvShow {
@@ -22,18 +27,16 @@ public class TvShow {
 	private String network;
 	private String runtime;
 	private String timezone;
+	private String imageUrl;
 
-	private String latestEpisodeTitle;
-	private String latestEpisodeNumber; // SSxEE
-	private Date latestEpisodeDate; // MMMM/dd/yyyy
-
-	private String nextEpisodeTitle;
-	private String nextEpisodeNumber;
-	private Date nextEpisodeDate;
+	private TvEpisode latestEpisode;
+	private TvEpisode nextEpisode;
+	
+	private ArrayList<ArrayList<TvEpisode>> episodes;
 
 	/* end quickinfo */
 
-	public TvShow(String id, String title, String latestEpisodeTitle, String latestEpisodeNumber, Date latestEpisodeDate, Date started, Date ended, String status, String runtime, String country, String classification, String network, String url) {
+	public TvShow(String id, String title, Date started, Date ended, String status, String runtime, String country, String classification, String network, String url, String imageUrl) {
 		this.id = id;
 		this.title = title;
 		this.started = started;
@@ -44,34 +47,20 @@ public class TvShow {
 		this.classification = classification;
 		this.network = network;
 		this.url = url;
-
-		this.latestEpisodeTitle = latestEpisodeTitle;
-		this.latestEpisodeNumber = latestEpisodeNumber;
-		this.latestEpisodeDate = latestEpisodeDate;
 	}
 
 	public TvShow(String title) {
 		this.title = title;
 	}
 
-	private String getFormattedDate(Date date) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.UK);
-		sdf.setTimeZone(DateMgmt.TIME_ZONE);
-		return date != null ? sdf.format(date) : null;
-	}
-
-	private String getFormattedAirTime(Date date) {
-		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm z", Locale.UK);
-		sdf.setTimeZone(DateMgmt.TIME_ZONE);
-		return date != null ? sdf.format(date) : null;
-	}
+	
 
 	private String getLatestEpisode() {
 		TimeZone zone = TimeZone.getDefault();
 		System.out.println(zone.getDisplayName());
 		System.out.println(zone.getID());
 		try {
-			return getFormattedDate(latestEpisodeDate) + " " + getFormattedAirTime(latestEpisodeDate) + " (" + DateMgmt.getFormattedSinceDate(latestEpisodeDate) + " ago)";
+			return DateMgmt.getFormattedDate(latestEpisode.getAirTime()) + " " + DateMgmt.getFormattedAirTime(latestEpisode.getAirTime()) + " (" + DateMgmt.getFormattedSinceDate(latestEpisode.getAirTime()) + " ago)";
 		} catch (Exception e) {
 			return "Nothing aired yet";
 		}
@@ -79,7 +68,7 @@ public class TvShow {
 
 	private String getNextEpisode() {
 		try {
-			return getFormattedDate(nextEpisodeDate) + " " + getFormattedAirTime(nextEpisodeDate) + " (in " + DateMgmt.getFormattedTilDate(nextEpisodeDate) + ")";
+			return DateMgmt.getFormattedDate(nextEpisode.getAirTime()) + " " + DateMgmt.getFormattedAirTime(nextEpisode.getAirTime()) + " (in " + DateMgmt.getFormattedTilDate(nextEpisode.getAirTime()) + ")";
 		} catch (Exception e) {
 			return "TBA";
 		}
@@ -89,8 +78,8 @@ public class TvShow {
 		String[][] availableForAll = { //
 		{ "TV", title },//
 				{ "Latest Episode", getLatestEpisode() },//
-				{ "Start", getFormattedDate(started) },//
-				{ "End", getFormattedDate(ended) },//
+				{ "Start", DateMgmt.getFormattedDate(started) },//
+				{ "End", DateMgmt.getFormattedDate(ended) },//
 				{ "Status", status },//
 				{ "Runtime", runtime },//
 				{ "Country", country },//
@@ -106,9 +95,9 @@ public class TvShow {
 		String[][] availableForAll = { //
 		{ "TV", title },//
 				{ "Latest Episode", getLatestEpisode() },//
-				{ "Number", latestEpisodeNumber },//
-				{ "Start", getFormattedDate(started) },//
-				{ "End", getFormattedDate(ended) },//
+				{ "Number", latestEpisode.getFormattedEpisodeNubmer() },//
+				{ "Start", DateMgmt.getFormattedDate(started) },//
+				{ "End", DateMgmt.getFormattedDate(ended) },//
 				{ "Status", status },//
 				{ "URL", url },//
 		};
@@ -120,8 +109,8 @@ public class TvShow {
 		String[][] availableForAll = { //
 		{ "TV", title },//
 				{ "Latest Episode", getLatestEpisode() },//
-				{ "Number", latestEpisodeNumber },//
-				{ "Title", latestEpisodeTitle },//
+				{ "Number", latestEpisode.getFormattedEpisodeNubmer() },//
+				{ "Title", latestEpisode.getTitle() },//
 		};
 
 		return availableForAll;
@@ -131,31 +120,66 @@ public class TvShow {
 		String[][] availableForAll = { //
 		{ "TV", title },//
 				{ "Next Episode", getNextEpisode() },//
-				{ "Number", nextEpisodeNumber },//
-				{ "Title", nextEpisodeTitle },//
+				{ "Number", nextEpisode.getFormattedEpisodeNubmer() },//
+				{ "Title", nextEpisode.getTitle() },//
 		};
 
 		return availableForAll;
+	}
+	public void setEpisodes(ArrayList<ArrayList<TvEpisode>> arrayList) {
+		this.episodes = arrayList;
 	}
 
 	public String getId() {
 		return id;
 	}
 
-	public void setNextEpisodeTitle(String nextEpisodeTitle) {
-		this.nextEpisodeTitle = nextEpisodeTitle;
+	public Date getStarted() {
+		return started;
 	}
 
-	public void setNextEpisodeDate(Date nextEpisodeDate) {
-		this.nextEpisodeDate = nextEpisodeDate;
+	public String getUrl() {
+		return url;
 	}
 
-	public void setNextEpisodeNumber(String nextEpisodeNumber) {
-		this.nextEpisodeNumber = nextEpisodeNumber;
+	public String getPremiered() {
+		return premiered;
 	}
 
-	public String getNextEpisodeTitle() {
-		return nextEpisodeTitle;
+	public Date getEnded() {
+		return ended;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public String getClassification() {
+		return classification;
+	}
+
+	public String[] getGenres() {
+		return genres;
+	}
+
+	public String getNetwork() {
+		return network;
+	}
+
+	public String getRuntime() {
+		return runtime;
+	}
+
+	public void setNextEpisode(TvEpisode nextEpisode) {
+		this.nextEpisode = nextEpisode;
+	}
+
+	public void setLatestEpisode(TvEpisode latestEpisode) {
+		this.latestEpisode = latestEpisode;
 	}
 
 	public void setTimezone(String timezone) {
@@ -168,5 +192,8 @@ public class TvShow {
 
 	public String getTitle() {
 		return title;
+	}
+	public ArrayList<ArrayList<TvEpisode>> getEpisodes() {
+		return episodes;
 	}
 }
