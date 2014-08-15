@@ -7,19 +7,19 @@ import parserBro.parsers.youTube.YoutubeParser;
 
 public class ParserFactory {
 
-	public static ImdbParser createImdbParser() {
-		return new ImdbParser();
-	}
+  public static ImdbParser createImdbParser() {
+    return new ImdbParser();
+  }
 
-	public static MiscParser createMiscParser() {
-		return new MiscParser();
-	}
+  public static MiscParser createMiscParser() {
+    return new MiscParser();
+  }
 
-	public static YoutubeParser createYoutubeParser() {
-		return new YoutubeParser();
-	}
+  public static YoutubeParser createYoutubeParser() {
+    return new YoutubeParser();
+  }
 
-	public static TvShowParser createTvShowParser() {
-		return new TvShowParser();
-	}
+  public static TvShowParser createTvShowParser() {
+    return new TvShowParser();
+  }
 }

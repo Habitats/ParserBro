@@ -1,17 +1,18 @@
 package parserBro;
 
 public class NotFoundException extends Exception {
-	private String showName;
-	private Exception e;
 
-	public NotFoundException() {
-	}
+  private String showName;
+  private Exception e;
 
-	public NotFoundException(Exception e) {
-		this.e = e;
-	}
+  public NotFoundException() {
+  }
 
-	public NotFoundException(String showName) {
-		this.showName = showName;
-	}
+  public NotFoundException(Exception e) {
+    this.e = e;
+  }
+
+  public NotFoundException(String showName) {
+    this.showName = showName;
+  }
 }
